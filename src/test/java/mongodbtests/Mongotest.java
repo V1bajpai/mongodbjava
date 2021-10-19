@@ -5,11 +5,15 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.bson.Document;
+import org.bson.conversions.Bson;
 
 import com.mongodb.*;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Updates;
+
 
 //import com.mongodb.client.*;
 
@@ -30,11 +34,27 @@ public class Mongotest {
 		
 		// Retrieving a collection
 		MongoCollection<Document> collection = database.getCollection("employees");
-		System.out.println("Collection sampleCollection selected successfully");	
-		insertSingleIntoDatabase(collection); // call fun insertSingleIntoDatabase
+		System.out.println("Collection sampleCollection selected successfully");
+		
+//		insertSingleIntoDatabase(collection); // call fun insertSingleIntoDatabase
+//		insertManyIntoDatabase(collection);
 	    selectAllRecordsFromACollection(collection);  // call fun selectAllRecordsFromACollection
+//	    deleteOne(collection); // Delete a row using condition
+	    updateRecord(collection);
+	    selectAllRecordsFromACollection(collection);
+
+//	    deleteManyRecords(collection); //delete many records
+//	    database.drop();  //Drop total element
 	}
 	
+	
+	private static void updateRecord(MongoCollection<Document> collection) {
+		// TODO Auto-generated method stub
+		collection.updateOne(Filters.eq("name", "Robin"), Updates.set("age", 32));
+
+	}
+
+
 	// Single node insertion
 	public static void insertSingleIntoDatabase(MongoCollection collection) {
 		Document document1 = new Document("name", "Peterson")
@@ -44,7 +64,7 @@ public class Mongotest {
 		collection.insertOne(document1);   //       Inserting document into the collection
 	}
 	
-	public void insertManyIntoDatabase(MongoCollection collection) {
+	public static void insertManyIntoDatabase(MongoCollection collection) {
 		  Document document1 = new Document("name", "Ram").append("age", 26).append("city", "Hyderabad").append("salary", 10000);
 	      Document document2 = new Document("name", "Robert").append("age", 27).append("city", "Vishakhapatnam").append("salary", 11000);
 	      Document document3 = new Document("name", "Gonna").append("age", 30).append("city", "Delhi").append("salary", 12000);
@@ -71,7 +91,7 @@ public class Mongotest {
 	      list.add(document10);
 		  list.add(document11);
 
-	      collection.insertMany(list);  // Insert many
+	      collection.insertMany(list);  // Insert many rows
 		  System.out.println("Document inserted successfully");
 	}
 	
@@ -82,6 +102,22 @@ public class Mongotest {
 	      while (it.hasNext()) {
 	         System.out.println(it.next());
 	      }
+	}
+	
+	// Deletion of one row using condition
+	public static void deleteOne(MongoCollection collection)
+	{
+		collection.deleteOne(Filters.eq("name", "Peterson"));
+		System.out.println("field is deleted");
+	}
+	
+	public static void deleteManyRecords(MongoCollection collection)
+	{
+		FindIterable<Document> iterDoc = collection.find();
+	      Iterator it = iterDoc.iterator();
+	      while (it.hasNext()) {
+	         collection.deleteOne((Bson) it.next());
+	      }		
 	}
 
 }
